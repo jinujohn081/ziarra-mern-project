@@ -46,6 +46,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const Product = require("./models/Products");
 const User = require("./models/User");
+const Cart = require("./models/Cart");
 const products = require("./data/products");
 
 dotenv.config();
@@ -56,6 +57,7 @@ const seedData = async () => {
     // Clear existing data
     await Product.deleteMany();
     await User.deleteMany();
+    await Cart.deleteMany();
 
     console.log("Old data cleared");
 
