@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   HiOutlineUser,
   HiOutlineShoppingBag,
@@ -13,6 +14,11 @@ import { IoMdClose } from "react-icons/io";
 const NavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+  const { cart } = useSelector((state) => state.cart);
+  const cartItemCount =
+    cart?.products?.reduce((total, product) => total + product.quantity, 0) ||
+    0;
+
   const toggleCartDrawer = () => {
     setDrawerOpen(!drawerOpen);
     console.log(drawerOpen);
@@ -33,28 +39,28 @@ const NavBar = () => {
         {/* center-menu */}
         <div className="hidden md:flex space-x-4">
           <Link
-            to="/collections/all"
+            to="/collections/all?gender=Men"
             className="text-gray-800 hover:text-black text-sm uppercase font-medium"
           >
             men
           </Link>
           <Link
-            to="#"
+            to="/collections/all?gender=Women"
             className="text-gray-800 hover:text-black text-sm uppercase font-medium"
           >
             women
           </Link>
           <Link
-            to="#"
+            to="/collections/all?category=Top Wear"
             className="text-gray-800 hover:text-black text-sm uppercase font-medium"
           >
-            Kids
+            Top Wear
           </Link>
           <Link
-            to="#"
+            to="/collections/all?category=Bottom Wear"
             className="text-gray-800 hover:text-black text-sm uppercase font-medium"
           >
-            Jewellery
+            Bottom Wear
           </Link>
         </div>
         {/* right-icons */}
@@ -77,9 +83,11 @@ const NavBar = () => {
             className="relative hover:text-black"
           >
             <HiOutlineShoppingBag className="h-6 w-6 text-gary-700" />
-            <span className="absolute -top-1  bg-red-700 rounded-full text-xs px-2 py-0.5 text-white items-center">
-              4
-            </span>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1  bg-red-700 rounded-full text-xs px-2 py-0.5 text-white items-center">
+                {cartItemCount}
+              </span>
+            )}
           </button>
 
           {/* search icon */}

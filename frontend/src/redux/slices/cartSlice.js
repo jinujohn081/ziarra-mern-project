@@ -78,7 +78,7 @@ export const updateCartItemQuantity = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      rejectWithValue(error.response?.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );

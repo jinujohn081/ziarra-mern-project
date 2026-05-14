@@ -1,7 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const ProductGrid = ({ products }) => {
+const ProductGrid = ({ products, loading, error }) => {
+  if (loading) {
+    console.log("products:", products);
+    return <p>Loading.....</p>;
+  }
+
+  if (error) {
+    return <p>Error....:{error}</p>;
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {products.map((product, index) => (
@@ -15,8 +24,20 @@ const ProductGrid = ({ products }) => {
               />
             </div>
             <h3 className="text-sm mb-2">{product.name}</h3>
-            <p className="text-gary-500 font-medium text-sm tracking-tighter">
+            <p className="text-gray-500 font-medium text-sm tracking-tighter">
               ${product.price}
+            </p>
+            <p className="text-gray-500 font-medium text-sm tracking-tighter">
+              {product.category}
+            </p>
+            <p className="text-gray-500 font-medium text-sm tracking-tighter">
+              {product.gender}
+            </p>
+            <p className="text-gray-500 font-medium text-sm tracking-tighter">
+              {product.sizes?.join(", ")}
+            </p>
+            <p className="text-gray-500 font-medium text-sm tracking-tighter">
+              {product.colors?.join(", ")}
             </p>
           </div>
         </Link>

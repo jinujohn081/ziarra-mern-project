@@ -1,147 +1,108 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaFilter } from "react-icons/fa";
+import { useSearchParams, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import FilterSideBar from "../components/Products/FilterSideBar";
 import SortOptions from "../components/Products/SortOptions";
 import ProductGrid from "../components/Products/ProductGrid";
+
+import { fetchProductsByFilters } from "../redux/slices/productSlice";
+
 const CollectionPage = () => {
-  const [products, setProducts] = useState([]);
+  const { collection } = useParams();
+
+  const [searchParams] = useSearchParams();
+
+  const dispatch = useDispatch();
+
+  const { products, loading, error } = useSelector((state) => state.products);
+
   const sidebarRef = useRef(null);
+
   const [sideBarOpen, setSideBarOpen] = useState(false);
 
+  // convert URL params into string
+  const queryString = searchParams.toString();
+
+  // FETCH PRODUCTS WHEN URL FILTERS CHANGE
+  useEffect(() => {
+    const queryParams = Object.fromEntries([...searchParams]);
+    console.log("searchParams", [...searchParams]);
+    console.log("queryParams", queryParams);
+    console.log("collection", collection);
+
+    dispatch(
+      fetchProductsByFilters({
+        collection,
+        ...queryParams,
+      })
+    );
+  }, [dispatch, collection, queryString]);
+
+  // TOGGLE SIDEBAR
   const toggleSideBar = () => {
-    setSideBarOpen(!sideBarOpen);
+    setSideBarOpen((prev) => !prev);
   };
 
+  // CLOSE SIDEBAR WHEN CLICK OUTSIDE
   const handleClickOutside = (e) => {
-    //  close sidebar if clicked outside
     if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
       setSideBarOpen(false);
     }
   };
 
+  // ADD + REMOVE EVENT LISTENER
   useEffect(() => {
-    //   add eventlistener for click outside
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.addEventListener("mousedown", handleClickOutside);
-    };
-    // clean event listenr
 
-    //document.addEventListener.remove("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
-  useEffect(() => {
-    setTimeout(() => {
-      const fetchProducts = [
-        {
-          _id: 1,
-          name: "Prodcut 1",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=5",
-            },
-          ],
-        },
-        {
-          _id: 2,
-          name: "Prodcut 2",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=6",
-            },
-          ],
-        },
-        {
-          _id: 3,
-          name: "Prodcut 3",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=7",
-            },
-          ],
-        },
-        {
-          _id: 4,
-          name: "Prodcut 4",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=8",
-            },
-          ],
-        },
-        {
-          _id: 1,
-          name: "Prodcut 1",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=5",
-            },
-          ],
-        },
-        {
-          _id: 2,
-          name: "Prodcut 2",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=6",
-            },
-          ],
-        },
-        {
-          _id: 3,
-          name: "Prodcut 3",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=7",
-            },
-          ],
-        },
-        {
-          _id: 4,
-          name: "Prodcut 4",
-          price: 100,
-          images: [
-            {
-              url: "https://picsum.photos/500/500?random=8",
-            },
-          ],
-        },
-      ];
-      setProducts(fetchProducts);
-    }, 1000);
-  }, []);
+
   return (
     <div className="flex flex-col lg:flex-row">
-      {/* mobile filter button */}
+      {/* MOBILE FILTER BUTTON */}
       <button
         onClick={toggleSideBar}
         className="lg:hidden border p-2 flex justify-center items-center"
       >
         <FaFilter className="mr-2" />
+        Filters
       </button>
-      {/* filter side bar */}
+
+      {/* FILTER SIDEBAR */}
       <div
         ref={sidebarRef}
-        className={`${
-          sideBarOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed inset-y-0 left-0 w-64  bg-white z-50 transition-transform duration-300 overflow-y-auto  lg:static lg:translate-x-0`}
+        className={`
+          ${sideBarOpen ? "translate-x-0" : "-translate-x-full"}
+          
+          fixed inset-y-0 left-0
+          w-64
+          bg-white
+          z-50
+          transition-transform
+          duration-300
+          overflow-y-auto
+          
+          lg:static
+          lg:translate-x-0
+        `}
       >
         <FilterSideBar />
       </div>
+
+      {/* PRODUCTS SECTION */}
       <div className="flex-grow p-4">
-        <h2 className="text-2xl uppercase mb-4">All collection</h2>
-        {/* sort options
-         */}
+        <h2 className="text-2xl uppercase mb-4">All Collection</h2>
+
+        {/* SORT OPTIONS */}
         <SortOptions />
-        <ProductGrid products={products} />
+
+        {/* PRODUCT GRID */}
+        <ProductGrid products={products} loading={loading} error={error} />
       </div>
-      {/* product grid */}
     </div>
   );
 };
