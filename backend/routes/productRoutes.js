@@ -135,9 +135,10 @@ router.get("/best-seller", async (req, res) => {
     } else {
       res.status(404).json({ message: "Product not found" });
     }
-  } catch (error) {}
-  console.error(error);
-  res.status(500).send("Server Error");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
 });
 
 //@route GET/api/products/new-arrivals
@@ -194,38 +195,47 @@ router.get("/", async (req, res) => {
     let query = {};
 
     // filter logic
-    if (collection && collection.toLocaleLowerCase() !== "all") {
-      query.collections = collection;
-    }
-    if (category && category.toLowerCase() !== "all") {
-      query.category = category;
-    }
-    if (material) {
-      query.material = { $in: material.split(",") };
-    }
-    if (brand) {
-      query.brand = { $in: brand.split(",") };
-    }
-    if (size) {
-      query.sizes = { $in: size.split(",") };
-    }
-    if (color) {
-      query.colors = { $in: [color] };
-    }
-    if (gender) {
-      query.gender = gender;
-    }
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
-    }
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: "i" } },
 
-        { description: { $regex: search, $options: "i" } },
-      ];
+    if (collection && collection.toLowerCase() !== "all") {
+      query.collections = {
+        $regex: new RegExp(`^${collection}$`, "i"),
+      };
+    }
+
+    if (category && category.toLowerCase() !== "all") {
+      query.category = {
+        $regex: new RegExp(`^${category}$`, "i"),
+      };
+    }
+
+    if (gender) {
+      query.gender = {
+        $regex: new RegExp(`^${gender}$`, "i"),
+      };
+    }
+
+    if (material) {
+      query.material = {
+        $in: material.split(",").map((m) => new RegExp(`^${m}$`, "i")),
+      };
+    }
+
+    if (brand) {
+      query.brand = {
+        $in: brand.split(",").map((b) => new RegExp(`^${b}$`, "i")),
+      };
+    }
+
+    if (size) {
+      query.sizes = {
+        $in: size.split(","),
+      };
+    }
+
+    if (color) {
+      query.colors = {
+        $in: color.split(",").map((c) => new RegExp(`^${c}$`, "i")),
+      };
     }
 
     //sort logic

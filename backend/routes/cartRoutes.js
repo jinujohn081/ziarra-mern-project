@@ -44,7 +44,7 @@ router.post("/", async (req, res) => {
         cart.products.push({
           productId,
           name: product.name,
-          image: product.image[0].url,
+          image: product.images[0].url,
           price: product.price,
           size,
           color,
@@ -218,7 +218,7 @@ router.post("/merge", protect, async (req, res) => {
           }
         });
         userCart.totalPrice = userCart.products.reduce(
-          (acc, item) => acc + item * item.quantity,
+          (acc, item) => acc + item.price * item.quantity,
           0
         );
         await userCart.save();
